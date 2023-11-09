@@ -92,7 +92,7 @@ def display_hangman(remaining_attempts):
 def game():
     
     #word list of the game
-    words = ['banana','avocado','grape','orange','strawberry','pineapple','apple']
+    words = ['banana','avocado','grape','orange','strawberry','pineapple','apple','pear']
 
     #randomly choose a word
     word = random.choice(words)
