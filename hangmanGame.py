@@ -12,131 +12,161 @@ def clean_screen():
     else:
         _=system('clear')
 
-#display the hangman
-def display_hangman(remaining_attempts):
+#list of stages
+board = ['''
 
-    # list of stages
-    stages = [  # stage 6 (final)
-                """
-                   --------
-                   |      |
-                   |      O
-                   |     \\|/
-                   |      |
-                   |     / \\
-                   -
-                """,
-                # stage 5
-                """
-                   --------
-                   |      |
-                   |      O
-                   |     \\|/
-                   |      |
-                   |     / 
-                   -
-                """,
-                # stage 4
-                """
-                   --------
-                   |      |
-                   |      O
-                   |     \\|/
-                   |      |
-                   |      
-                   -
-                """,
-                # stage 3
-                """
-                   --------
-                   |      |
-                   |      O
-                   |     \\|
-                   |      |
-                   |     
-                   -
-                """,
-                # stage 2
-                """
-                   --------
-                   |      |
-                   |      O
-                   |      |
-                   |      |
-                   |     
-                   -
-                """,
-                # stage 1
-                """
-                   --------
-                   |      |
-                   |      O
-                   |    
-                   |      
-                   |     
-                   -
-                """,
-                # stage 0
-                """
-                   --------
-                   |      |
-                   |      
-                   |    
-                   |      
-                   |     
-                   -
-                """
-    ]
-    return stages[remaining_attempts]
-#function
-def game():
-    
-    #word list of the game
+>>>>>>>>>>Hangman<<<<<<<<<<
+
++---+
+|   |
+    |
+    |
+    |
+    |
+=========''', '''
+
++---+
+|   |
+O   |
+    |
+    |
+    |
+=========''', '''
+
++---+
+|   |
+O   |
+|   |
+    |
+    |
+=========''', '''
+
+ +---+
+ |   |
+ O   |
+/|   |
+     |
+     |
+=========''', '''
+
+ +---+
+ |   |
+ O   |
+/|\  |
+     |
+     |
+=========''', '''
+
+ +---+
+ |   |
+ O   |
+/|\  |
+/    |
+     |
+=========''', '''
+
+ +---+
+ |   |
+ O   |
+/|\  |
+/ \  |
+     |
+=========''']
+
+#class
+class Hangman:
+    #constructor
+    def __init__(self,word):
+        self.word = word
+        self.wrong_letters = []
+        self.discovered_letters = []
+
+    #method to discover the letter
+    def guess(self, letter):
+        if letter in self.word and letter not in self.discovered_letters:
+            self.discovered_letters.append(letter)
+        elif letter not in self.word and letter not in self.wrong_letters:
+            self.wrong_letters.append(letter)
+        else:
+            return False
+        return True
+    #method to verify if the game is finished
+    def hangman_over(self):
+        return self.hangman_won() or (len(self.wrong_letters) == 6)
+
+    #method to verify if player has won
+    def hangman_won(self):
+        if '_'  not in self.hide_letter():
+            return True
+        return False
+    #method to not show the letter in board
+    def hide_letter(self):
+        rtn = ''
+        for letter in self.word:
+            if letter not in self.discovered_letters:
+                rtn += '_'
+            else:
+                rtn += letter
+        return rtn
+    #method to check game status and print the board in the screen
+    def print_game_status(self):
+            
+            print (board[len(self.wrong_letters)])
+            
+            print ('\nWord: ' + self.hide_letter())
+            
+            print ('\nWrong Letters: ',) 
+            
+            for letter in self.wrong_letters:
+                print (letter,) 
+            
+            print ()
+            
+            print ('Correct letters: ',)
+            
+            for letter in self.discovered_letters:
+                print (letter,)
+            
+            print ()
+def rand_word():
+
+	#word list of the game
     words = ['banana','avocado','grape','orange','strawberry','pineapple','apple','pear']
 
     #randomly choose a word
     word = random.choice(words)
-
-    #list comprehension
-    discovered_letters = ['_' for letter in word]
-
-    #attempts
-    remaining_attempts = 6
-
-    #wrong letters list
-    wrong_letters = []
-
-    while remaining_attempts > 0:
         
-        #cleans the screen
-        clean_screen()
-        #prints
-        print(display_hangman(remaining_attempts))
-        print("Guess the word below:\n")
-        print(" ".join(discovered_letters))
-        print("\nRemaining attempts: ",remaining_attempts)
-        print("Discovered letters:", " ".join(wrong_letters))
+    return word
 
-        #attempt
-        attempt = input("\nEnter a letter: ").lower()
+def main():
 
-        #conditional
-        if attempt in word:
-            index = 0
-            for letter in word:
-                if attempt == letter:
-                    discovered_letters[index] = letter
-                index += 1
-        else:
-            remaining_attempts -=1
-            wrong_letters.append(attempt)
+    clean_screen()
+
+    #create the object and select a word randomly
+    game = Hangman(rand_word())
+
+    #while game not finished, print the status, ask for a letter and read it
+    while not game.hangman_over():
         
-        if "_" not in discovered_letters:
-            print("\nYou win!, the word was:",word)
-            break
+        #game status
+        game.print_game_status()
+        
+        #receives a input from terminal
+        user_input = input('\nType a letter: ')
+        
+        #verify if typed letter is part of a word
+        game.guess(user_input)
 
-    if "_" in discovered_letters:
-        print("\nYou lose!, the word was:",word)
+    #verify game status
+    game.print_game_status()	
 
+    #prints a message in the screen
+    if game.hangman_won():
+        print ('\nCongratulations:! You win!!')
+    
+    else:
+        print ('\nGame over! You lose.')
+        print ('The word was ' + game.palavra)
+#execute the program		
 if __name__ == "__main__":
-    game()
+	main()
